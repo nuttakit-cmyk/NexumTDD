@@ -8,15 +8,20 @@ namespace Nexum.Server.Controllers
     [Route("[controller]")]
     public class PenaltyController : ControllerBase
     {
-        //public readonly IPenaltyCalculator penaltyCalculator;
+        public readonly IPercentagePenalty percentagePenalty;
         //public readonly IDailyPenaltyStrategy dailyPenaltyStrategy;
 
-        public PenaltyController()
+        public PenaltyController(IPercentagePenalty percentagePenalty)
         {
-            //this.penaltyCalculator = penaltyCalculator;
-            //this.dailyPenaltyStrategy = dailyPenaltyStrategy;
+            this.percentagePenalty = percentagePenalty;
         }
         
+        public PenaltyPoliciesResponse xxxx(PenaltyPoliciesRequest penaltyPoliciesRequest)
+        {
+            PenaltyPoliciesResponse x = percentagePenalty.Calculate(penaltyPoliciesRequest);
+
+            return x;
+        }
 
 
     }
