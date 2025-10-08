@@ -72,16 +72,14 @@ namespace Nexum.Server.Services
             // คำนวณดอกเบี้ย
             if (calculateInterestRequest.InterestType == "PerMonth")
             {
-                interestAmount = calculateInterestRequest.PrincipalBalance * calculateInterestRequest.InterestRate;
+                interestAmount = Math.Round(calculateInterestRequest.PrincipalBalance * calculateInterestRequest.InterestRate, 2);
             }
             else if (calculateInterestRequest.InterestType == "PerDay")
             {
-                interestAmount = calculateInterestRequest.PrincipalBalance * calculateInterestRequest.InterestRate / 365;
+                interestAmount = Math.Round(calculateInterestRequest.PrincipalBalance * calculateInterestRequest.InterestRate / 365, 2);
             }
 
             // รวมยอดดอกเบี้ยสะสม และ สร้างรายการดอกเบี้ย
-            accumulatedInterest.AccumInterestRemain += interestAmount;
-
             StatementInterest createStatementInterest = new StatementInterest
             {
                 ProductContactId = calculateInterestRequest.ProductContactId,
@@ -94,6 +92,8 @@ namespace Nexum.Server.Services
             // บันทึกข้อมูลดอกเบี้ยสะสม
             _nexumConfigDAC.UpdateAccumulatedInterest(accumulatedInterest.AccumInterestRemain + interestAmount);
 
+            // Console.WriteLine("InterestAmount: " + interestAmount);
+            // Console.WriteLine("AccumInterestRemain: " + accumulatedInterest.AccumInterestRemain + interestAmount);
 
             return new CalculateInterestResponse()
             {
