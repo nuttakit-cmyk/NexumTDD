@@ -9,5 +9,7 @@
         public DateTime InterestFreePeriodDays { get; set; } // ระยะปลอดดอกเบี้ย วันสิ้นสุด
         public int ProductContactId { get; set; } // รหัสสัญญาสินเชื่อ
 
+        public decimal MaxInterestAmount { get; set; } // อัตราดอกเบี้ยสูงสุดต่อรอบบิล
+
     }
 }

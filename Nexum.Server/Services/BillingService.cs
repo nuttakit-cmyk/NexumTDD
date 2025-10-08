@@ -40,7 +40,8 @@ namespace Nexum.Server.Services
                 DueDate = productContact.DueDate,
                 InterestRate = productContact.InterestRate,
                 InterestType = productContact.InterestType,
-                InterestFreePeriodDays = productContact.InterestFreePeriodDays
+                InterestFreePeriodDays = productContact.InterestFreePeriodDays,
+                MaxInterestAmount = productContact.MaxInterestRatePerBilling
             };
             CalculateInterestResponse calculateInterestResponse = _interestService.CalculateInterest(calculateInterestRequest);
 

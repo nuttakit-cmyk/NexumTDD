@@ -79,13 +79,21 @@ namespace Nexum.Server.Services
                 interestAmount = Math.Round(calculateInterestRequest.PrincipalBalance * calculateInterestRequest.InterestRate / 365, 2);
             }
 
+            // อัตราดอกเบี้ยสูงสุดต่อรอบบิล
+            bool isMaxInterestAmount = false;
+            if (interestAmount > calculateInterestRequest.MaxInterestAmount)
+            {
+                interestAmount = calculateInterestRequest.MaxInterestAmount;
+                isMaxInterestAmount = true;
+            }
+
             // รวมยอดดอกเบี้ยสะสม และ สร้างรายการดอกเบี้ย
             StatementInterest createStatementInterest = new StatementInterest
             {
                 ProductContactId = calculateInterestRequest.ProductContactId,
                 InterestAmount = interestAmount,
                 AccumulatedAmount = accumulatedInterest.AccumInterestRemain + interestAmount,
-                Remark = "ดอกเบี้ยรอบนี้",
+                Remark = isMaxInterestAmount ? "ดอกเบี้ยรอบนี้สูงกว่าอัตราดอกเบี้ยสูงสุดต่อรอบบิล" : "ดอกเบี้ยรอบนี้",
             };
             _nexumConfigDAC.CreateStatementInterest(createStatementInterest);
 
