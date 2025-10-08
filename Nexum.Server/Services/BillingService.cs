@@ -37,7 +37,6 @@ namespace Nexum.Server.Services
             CalculateInterestRequest calculateInterestRequest = new CalculateInterestRequest()
             {
                 PrincipalBalance = creditWallet.PrincipalBalance,
-                DueDate = productContact.DueDate,
                 InterestRate = productContact.InterestRate,
                 InterestType = productContact.InterestType,
                 InterestFreePeriodDays = productContact.InterestFreePeriodDays,

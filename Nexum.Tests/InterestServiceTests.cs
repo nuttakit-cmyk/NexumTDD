@@ -299,6 +299,70 @@ namespace Nexum.Tests
 
         #endregion
 
+        #region Max Interest Amount - กรณีดอกเบี้ยเกินเพดานต่อรอบบิล
+
+        public static IEnumerable<object[]> MaxInterestAmountTestData()
+        {
+            // PerMonth: 1,000,000 * 0.20 = 200,000 แต่เพดาน = 150,000
+            // ดอกเบี้ยรอบนี้ = 150,000, ดอกเบี้ยสะสมใหม่ = 50,000 + 150,000 = 200,000
+            yield return new object[] { "PerMonth", 1000000m, 0.20m, 50000m, 150000m, 200000m, 150000m };
+
+            // PerDay: 1,000,000 * 0.365 / 365 = 1,000 แต่เพดาน = 500
+            // ดอกเบี้ยรอบนี้ = 500, ดอกเบี้ยสะสมใหม่ = 2,000 + 500 = 2,500
+            yield return new object[] { "PerDay", 1000000m, 0.365m, 2000m, 500m, 2500m, 500m };
+        }
+
+        [Theory]
+        [MemberData(nameof(MaxInterestAmountTestData))]
+        // ทดสอบกรณีที่ดอกเบี้ยคำนวณได้เกิน MaxInterestAmount ต้องถูกจำกัดตามเพดาน
+        public void CalculateInterest_ExceedsMaxInterestAmount_ShouldCapAtMax(
+            string interestType,
+            decimal principalBalance,
+            decimal interestRate,
+            decimal currentAccumulated,
+            decimal expectedInterest,
+            decimal expectedAccumulated,
+            decimal maxInterestAmount)
+        {
+            // Arrange
+            var request = new CalculateInterestRequest
+            {
+                PrincipalBalance = principalBalance,
+                InterestRate = interestRate,
+                InterestType = interestType,
+                ProductContactId = 1,
+                InterestFreePeriodDays = default(DateTime),
+                MaxInterestAmount = maxInterestAmount
+            };
+
+            var accumulatedInterest = new AccumulatedInterest
+            {
+                AccumulatedInterestId = 1,
+                ProductContactId = 1,
+                AccumInterestRemain = currentAccumulated
+            };
+
+            _mockNexumConfigDAC.Setup(x => x.GetAccumulatedInterest(1))
+                .Returns(accumulatedInterest);
+
+            // Act
+            var result = _interestService.CalculateInterest(request);
+
+            // Assert
+            Assert.Equal(expectedInterest, result.InterestAmount);
+            Assert.Equal(expectedAccumulated, result.AccumInterestRemain);
+
+            // Verify DAC calls และตรวจสอบ Remark ว่าเป็นข้อความกรณีเกินเพดาน
+            _mockNexumConfigDAC.Verify(x => x.GetAccumulatedInterest(1), Times.Once);
+            _mockNexumConfigDAC.Verify(x => x.CreateStatementInterest(It.Is<StatementInterest>(s =>
+                s.InterestAmount == expectedInterest &&
+                s.AccumulatedAmount == expectedAccumulated &&
+                s.Remark == "ดอกเบี้ยรอบนี้สูงกว่าอัตราดอกเบี้ยสูงสุดต่อรอบบิล")), Times.Once);
+            _mockNexumConfigDAC.Verify(x => x.UpdateAccumulatedInterest(expectedAccumulated), Times.Once);
+        }
+
+        #endregion
+
         #region Exception Cases - กรณีที่เจอข้อผิดแปลกจากสิ่งที่มันควรจะเป็น
 
         public static IEnumerable<object[]> ValidationErrorTestData()
@@ -309,9 +373,9 @@ namespace Nexum.Tests
             // กรณีที่อัตราดอกเบี้ยเป็นค่าลบ
             // ระบบควร throw ArgumentException พร้อมข้อความ "InterestRate cannot be negative"
             yield return new object[] { 10000m, -0.15m, "PerMonth", "InterestRate", "InterestRate cannot be negative" };
-            // กรณีที่ InterestType เป็น null
+            // กรณีที่ InterestType เป็น null (ตั้งใจ)
             // ระบบควร throw ArgumentException พร้อมข้อความ "InterestType is required"
-            yield return new object[] { 10000m, 0.15m, null, "InterestType", "InterestType is required" };
+            yield return new object[] { 10000m, 0.15m, null!, "InterestType", "InterestType is required" };
             // กรณีที่ InterestType เป็น empty string
             // ระบบควร throw ArgumentException พร้อมข้อความ "InterestType is required"
             yield return new object[] { 10000m, 0.15m, "", "InterestType", "InterestType is required" };
@@ -321,6 +385,10 @@ namespace Nexum.Tests
             // กรณีที่ InterestType ไม่ถูกต้อง (ไม่ใช่ PerMonth หรือ PerDay)
             // ระบบควร throw ArgumentException พร้อมข้อความ "InterestType is invalid"
             yield return new object[] { 10000m, 0.15m, "InvalidType", "InterestType", "InterestType is invalid" };
+            // กรณีที่ MaxInterestAmount เป็นค่าติดลบ
+            // ระบบควร throw ArgumentException พร้อมข้อความ "MaxInterestAmount cannot be negative"
+            // หมายเหตุ: ใช้ interestType ที่ถูกต้องเพื่อให้ชน validation ที่ MaxInterestAmount
+            yield return new object[] { 10000m, 0.15m, "PerMonth", "MaxInterestAmount", "MaxInterestAmount cannot be negative" };
         }
 
         [Theory]
@@ -341,7 +409,7 @@ namespace Nexum.Tests
                 InterestType = interestType,
                 ProductContactId = 1,
                 InterestFreePeriodDays = default(DateTime),
-                MaxInterestAmount = 1000000m // ตั้งค่าสูงเพื่อไม่ให้จำกัดการคำนวณดอกเบี้ย
+                MaxInterestAmount = expectedParamName == "MaxInterestAmount" ? -1m : 1000000m // เจาะจงให้ติดลบเมื่อทดสอบเคสนี้
             };
 
             // Act & Assert

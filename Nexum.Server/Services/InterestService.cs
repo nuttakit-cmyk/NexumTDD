@@ -45,6 +45,11 @@ namespace Nexum.Server.Services
                 throw new ArgumentException("InterestRate cannot be negative.", nameof(calculateInterestRequest.InterestRate));
             }
 
+            if (calculateInterestRequest.MaxInterestAmount < 0)
+            {
+                throw new ArgumentException("MaxInterestAmount cannot be negative.", nameof(calculateInterestRequest.MaxInterestAmount));
+            }
+
             // ดึงข้อมูลดอกเบี้ยสะสม
             AccumulatedInterest accumulatedInterest = _nexumConfigDAC.GetAccumulatedInterest(calculateInterestRequest.ProductContactId);
 
