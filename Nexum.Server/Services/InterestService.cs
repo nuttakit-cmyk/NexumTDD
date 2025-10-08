@@ -35,6 +35,11 @@ namespace Nexum.Server.Services
                 throw new ArgumentException("InterestType is required.", nameof(calculateInterestRequest.InterestType));
             }
 
+            if (calculateInterestRequest.InterestType != "PerMonth" && calculateInterestRequest.InterestType != "PerDay")
+            {
+                throw new ArgumentException("InterestType is invalid.", nameof(calculateInterestRequest.InterestType));
+            }
+
             if (calculateInterestRequest.InterestRate < 0)
             {
                 throw new ArgumentException("InterestRate cannot be negative.", nameof(calculateInterestRequest.InterestRate));

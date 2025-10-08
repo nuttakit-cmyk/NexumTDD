@@ -21,22 +21,22 @@ namespace Nexum.Tests
 
         public static IEnumerable<object[]> PerMonthTestData()
         {
-            // เงินต้น 10000 บาท อัตราดอกเบี้ย 15% ต่อปี 
+            // เงินต้น 10000 บาท อัตราดอกเบี้ย 15% ต่อปี ดอกเบี้ยสะสม 500 บาท
             // 10000 * 0.15 = 1500
             // ดอกเบี้ยรอบนี้ 1500 บาท ดอกเบี้ยสะสม 2000 บาท
             // 500 + 1500 = 2000
             yield return new object[] { 10000m, 0.15m, 500m, 1500m, 2000m };
-            // เงินต้น 5000 บาท อัตราดอกเบี้ย 12% ต่อปี 
+            // เงินต้น 5000 บาท อัตราดอกเบี้ย 12% ต่อปี ดอกเบี้ยสะสม 200 บาท
             // 5000 * 0.12 = 600
             // ดอกเบี้ยรอบนี้ 600 บาท ดอกเบี้ยสะสม 800 บาท
             // 200 + 600 = 800
             yield return new object[] { 5000m, 0.12m, 200m, 600m, 800m };
-            // เงินต้น 20000 บาท อัตราดอกเบี้ย 18% ต่อปี 
+            // เงินต้น 20000 บาท อัตราดอกเบี้ย 18% ต่อปี ดอกเบี้ยสะสม 1000 บาท
             // 20000 * 0.18 = 3600
             // ดอกเบี้ยรอบนี้ 3600 บาท ดอกเบี้ยสะสม 4600 บาท
             // 1000 + 3600 = 4600
             yield return new object[] { 20000m, 0.18m, 1000m, 3600m, 4600m };
-            // เงินต้น 1000000 บาท อัตราดอกเบี้ย 12% ต่อปี 
+            // เงินต้น 1000000 บาท อัตราดอกเบี้ย 12% ต่อปี ดอกเบี้ยสะสม 50000 บาท
             // 1000000 * 0.12 = 120000
             // ดอกเบี้ยรอบนี้ 120000 บาท ดอกเบี้ยสะสม 170000 บาท
             // 50000 + 120000 = 170000
@@ -89,22 +89,22 @@ namespace Nexum.Tests
 
         public static IEnumerable<object[]> PerDayTestData()
         {
-            // เงินต้น 10000 บาท อัตราดอกเบี้ย 15% ต่อปี
+            // เงินต้น 10000 บาท อัตราดอกเบี้ย 15% ต่อปี ดอกเบี้ยสะสม 300 บาท
             // 10000 * 0.15 / 365 = 4.11
             // ดอกเบี้ยรอบนี้ 4.11 บาท ดอกเบี้ยสะสม 304.11 บาท
             // 300 + 4.11 = 304.11
             yield return new object[] { 10000m, 0.15m, 300m, 4.11m, 304.11m };
-            // เงินต้น 5000 บาท อัตราดอกเบี้ย 12% ต่อปี
+            // เงินต้น 5000 บาท อัตราดอกเบี้ย 12% ต่อปี ดอกเบี้ยสะสม 100 บาท
             // 5000 * 0.12 / 365 = 1.64
             // ดอกเบี้ยรอบนี้ 1.64 บาท ดอกเบี้ยสะสม 101.64 บาท
             // 100 + 1.64 = 101.64
             yield return new object[] { 5000m, 0.12m, 100m, 1.64m, 101.64m };
-            // เงินต้น 20000 บาท อัตราดอกเบี้ย 18% ต่อปี
+            // เงินต้น 20000 บาท อัตราดอกเบี้ย 18% ต่อปี ดอกเบี้ยสะสม 500 บาท
             // 20000 * 0.18 / 365 = 9.86
             // ดอกเบี้ยรอบนี้ 9.86 บาท ดอกเบี้ยสะสม 509.86 บาท
             // 500 + 9.86 = 509.86
             yield return new object[] { 20000m, 0.18m, 500m, 9.86m, 509.86m };
-            // เงินต้น 100000 บาท อัตราดอกเบี้ย 20% ต่อปี
+            // เงินต้น 100000 บาท อัตราดอกเบี้ย 20% ต่อปี ดอกเบี้ยสะสม 1000 บาท
             // 100000 * 0.20 / 365 = 54.79
             // ดอกเบี้ยรอบนี้ 54.79 บาท ดอกเบี้ยสะสม 1054.79 บาท
             // 1000 + 54.79 = 1054.79
@@ -157,15 +157,15 @@ namespace Nexum.Tests
 
         public static IEnumerable<object[]> ZeroValuesTestData()
         {
-            // กรณีที่ยอดเงินต้นเป็นศูนย์
+            // กรณีที่ยอดเงินต้นเป็นศูนย์ อัตราดอกเบี้ย 15% ต่อเดือน ดอกเบี้ยสะสมคงเดิม 100 บาท
             // 0 * 0.15 = 0
             // ดอกเบี้ยรอบนี้ 0 บาท ดอกเบี้ยสะสมคงเดิม 100 บาท
             yield return new object[] { 0m, 0.15m, 100m, 0m, 100m };
-            // กรณีที่อัตราดอกเบี้ยเป็นศูนย์
+            // กรณีที่อัตราดอกเบี้ยเป็นศูนย์ อัตราดอกเบี้ย 0% ต่อเดือน ดอกเบี้ยสะสมคงเดิม 200 บาท
             // 10000 * 0 = 0
             // ดอกเบี้ยรอบนี้ 0 บาท ดอกเบี้ยสะสมคงเดิม 200 บาท
             yield return new object[] { 10000m, 0m, 200m, 0m, 200m };
-            // กรณีที่ทั้งยอดเงินต้นและอัตราดอกเบี้ยเป็นศูนย์
+            // กรณีที่ทั้งยอดเงินต้นและอัตราดอกเบี้ยเป็นศูนย์ ดอกเบี้ยสะสมคงเดิม 50 บาท
             // 0 * 0 = 0
             // ดอกเบี้ยรอบนี้ 0 บาท ดอกเบี้ยสะสมคงเดิม 50 บาท
             yield return new object[] { 0m, 0m, 50m, 0m, 50m };
@@ -318,6 +318,9 @@ namespace Nexum.Tests
             // กรณีที่ InterestType เป็น whitespace เท่านั้น
             // ระบบควร throw ArgumentException พร้อมข้อความ "InterestType is required"
             yield return new object[] { 10000m, 0.15m, "   ", "InterestType", "InterestType is required" };
+            // กรณีที่ InterestType ไม่ถูกต้อง (ไม่ใช่ PerMonth หรือ PerDay)
+            // ระบบควร throw ArgumentException พร้อมข้อความ "InterestType is invalid"
+            yield return new object[] { 10000m, 0.15m, "InvalidType", "InterestType", "InterestType is invalid" };
         }
 
         [Theory]
@@ -347,6 +350,11 @@ namespace Nexum.Tests
 
             Assert.Equal(expectedParamName, exception.ParamName);
             Assert.Contains(expectedMessage, exception.Message);
+
+            // Verify DAC is not called when validation fails
+            _mockNexumConfigDAC.Verify(x => x.GetAccumulatedInterest(It.IsAny<int>()), Times.Never);
+            _mockNexumConfigDAC.Verify(x => x.CreateStatementInterest(It.IsAny<StatementInterest>()), Times.Never);
+            _mockNexumConfigDAC.Verify(x => x.UpdateAccumulatedInterest(It.IsAny<decimal>()), Times.Never);
         }
 
         [Fact]
@@ -364,43 +372,7 @@ namespace Nexum.Tests
             Assert.Contains("Request cannot be null", exception.Message);
         }
 
-        [Fact]
-        // ทดสอบกรณีที่ InterestType ไม่ถูกต้อง ควรได้ดอกเบี้ยเป็นศูนย์
-        public void CalculateInterest_InvalidInterestType_ShouldNotCalculateInterest()
-        {
-            // Arrange
-            var request = new CalculateInterestRequest
-            {
-                PrincipalBalance = 10000m,
-                InterestRate = 0.15m,
-                InterestType = "InvalidType",
-                ProductContactId = 1,
-                InterestFreePeriodDays = default(DateTime),
-                MaxInterestAmount = 1000000m // ตั้งค่าสูงเพื่อไม่ให้จำกัดการคำนวณดอกเบี้ย
-            };
 
-            var accumulatedInterest = new AccumulatedInterest
-            {
-                AccumulatedInterestId = 1,
-                ProductContactId = 1,
-                AccumInterestRemain = 500m
-            };
-
-            _mockNexumConfigDAC.Setup(x => x.GetAccumulatedInterest(1))
-                .Returns(accumulatedInterest);
-
-            // Act
-            var result = _interestService.CalculateInterest(request);
-
-            // Assert
-            Assert.Equal(0m, result.InterestAmount); // Should be 0 for invalid interest type
-            Assert.Equal(500m, result.AccumInterestRemain);
-
-            // Verify DAC calls
-            _mockNexumConfigDAC.Verify(x => x.GetAccumulatedInterest(1), Times.Once);
-            _mockNexumConfigDAC.Verify(x => x.CreateStatementInterest(It.IsAny<StatementInterest>()), Times.Once);
-            _mockNexumConfigDAC.Verify(x => x.UpdateAccumulatedInterest(500m), Times.Once);
-        }
 
         [Fact]
         // ทดสอบกรณีที่ DAC throw exception ควรส่งต่อ exception นั้น
