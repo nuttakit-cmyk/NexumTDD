@@ -6,71 +6,71 @@ namespace Nexum.Server.Services
 {
     public interface IInterestService
     {
-        CalculateInterestResponse CalculateInterest(CalculateInterestRequest calculateInterestRequest);
+        CalculateInterestResponse CalculateInterest(CalculateInterestRequest req);
 
     }
     public class InterestService : IInterestService
     {
         private readonly IAccumulatedInterestDAC _accumulatedInterestDAC;
-        private readonly IStatementInterestDAC _statementInterestDAC;
+        private readonly IInterestTransactionDAC _InterestTransactionDAC;
 
-        public InterestService(IAccumulatedInterestDAC accumulatedInterestDAC, IStatementInterestDAC statementInterestDAC)
+        public InterestService(IAccumulatedInterestDAC accumulatedInterestDAC, IInterestTransactionDAC InterestTransactionDAC)
         {
             _accumulatedInterestDAC = accumulatedInterestDAC;
-            _statementInterestDAC = statementInterestDAC;
+            _InterestTransactionDAC = InterestTransactionDAC;
         }
-        public CalculateInterestResponse CalculateInterest(CalculateInterestRequest calculateInterestRequest)
+        public CalculateInterestResponse CalculateInterest(CalculateInterestRequest req)
         {
 
             // Validate the request
-            if (calculateInterestRequest == null)
+            if (req == null)
             {
-                throw new ArgumentNullException(nameof(calculateInterestRequest), "Request cannot be null.");
+                throw new ArgumentNullException(nameof(req), "Request cannot be null.");
             }
 
-            if (calculateInterestRequest.PrincipalBalance < 0)
+            if (req.PrincipalBalance < 0)
             {
-                throw new ArgumentException("PrincipalBalance cannot be negative.", nameof(calculateInterestRequest.PrincipalBalance));
+                throw new ArgumentException("PrincipalBalance cannot be negative.", nameof(req.PrincipalBalance));
             }
 
-            if (string.IsNullOrWhiteSpace(calculateInterestRequest.InterestType))
+            if (string.IsNullOrWhiteSpace(req.InterestType))
             {
-                throw new ArgumentException("InterestType is required.", nameof(calculateInterestRequest.InterestType));
+                throw new ArgumentException("InterestType is required.", nameof(req.InterestType));
             }
 
-            if (calculateInterestRequest.InterestType != "PerMonth" && calculateInterestRequest.InterestType != "PerDay")
+            if (req.InterestType != "PerMonth" && req.InterestType != "PerDay")
             {
-                throw new ArgumentException("InterestType is invalid.", nameof(calculateInterestRequest.InterestType));
+                throw new ArgumentException("InterestType is invalid.", nameof(req.InterestType));
             }
 
-            if (calculateInterestRequest.InterestRate < 0)
+            if (req.InterestRate < 0)
             {
-                throw new ArgumentException("InterestRate cannot be negative.", nameof(calculateInterestRequest.InterestRate));
+                throw new ArgumentException("InterestRate cannot be negative.", nameof(req.InterestRate));
             }
 
-            if (calculateInterestRequest.MaxInterestAmount < 0)
+            if (req.MaxInterestAmount < 0)
             {
-                throw new ArgumentException("MaxInterestAmount cannot be negative.", nameof(calculateInterestRequest.MaxInterestAmount));
+                throw new ArgumentException("MaxInterestAmount cannot be negative.", nameof(req.MaxInterestAmount));
             }
 
             // ดึงข้อมูลดอกเบี้ยสะสม
-            AccumulatedInterest accumulatedInterest = _accumulatedInterestDAC.GetAccumulatedInterest(calculateInterestRequest.ProductContactId);
+            AccumulatedInterest accumulatedInterest = _accumulatedInterestDAC.GetAccumulatedInterest(req.ProductContactId);
 
             // ตรวจสอบว่าอยู่ในระยะปลอดดอกเบี้ยหรือไม่
-            if (calculateInterestRequest.InterestFreePeriodDays != default(DateTime))
+            if (req.InterestFreePeriodDays != default(DateTime))
             {
                 // ถ้าวันปัจจุบัน <= วันสิ้นสุดระยะปลอดดอกเบี้ย
-                if (DateTime.Now <= calculateInterestRequest.InterestFreePeriodDays)
+                if (DateTime.Now <= req.InterestFreePeriodDays)
                 {
                     // สร้างรายการดอกเบี้ย หมายเหตุ ยกเว้นการคำนวณ
-                    StatementInterest statementInterest = new StatementInterest
+                    InterestTransaction InterestTransaction = new InterestTransaction
                     {
-                        ProductContactId = calculateInterestRequest.ProductContactId,
+                        ProductContactId = req.ProductContactId,
                         InterestAmount = 0,
                         AccumulatedAmount = accumulatedInterest.AccumInterestRemain,
                         Remark = "ยกเว้นการคำนวณดอกเบี้ย",
                     };
-                    _statementInterestDAC.CreateStatementInterest(statementInterest);
+                    _InterestTransactionDAC.CreateInterestTransaction(InterestTransaction);
 
                     return new CalculateInterestResponse
                     {
@@ -83,32 +83,32 @@ namespace Nexum.Server.Services
             decimal interestAmount = 0;
 
             // คำนวณดอกเบี้ย
-            if (calculateInterestRequest.InterestType == "PerMonth")
+            if (req.InterestType == "PerMonth")
             {
-                interestAmount = Math.Round(calculateInterestRequest.PrincipalBalance * calculateInterestRequest.InterestRate, 2);
+                interestAmount = Math.Round(req.PrincipalBalance * req.InterestRate, 2);
             }
-            else if (calculateInterestRequest.InterestType == "PerDay")
+            else if (req.InterestType == "PerDay")
             {
-                interestAmount = Math.Round(calculateInterestRequest.PrincipalBalance * calculateInterestRequest.InterestRate / 365, 2);
+                interestAmount = Math.Round(req.PrincipalBalance * req.InterestRate / 365, 2);
             }
 
             // อัตราดอกเบี้ยสูงสุดต่อรอบบิล
             bool isMaxInterestAmount = false;
-            if (interestAmount > calculateInterestRequest.MaxInterestAmount)
+            if (interestAmount > req.MaxInterestAmount)
             {
-                interestAmount = calculateInterestRequest.MaxInterestAmount;
+                interestAmount = req.MaxInterestAmount;
                 isMaxInterestAmount = true;
             }
 
             // รวมยอดดอกเบี้ยสะสม และ สร้างรายการดอกเบี้ย
-            StatementInterest createStatementInterest = new StatementInterest
+            InterestTransaction createInterestTransaction = new InterestTransaction
             {
-                ProductContactId = calculateInterestRequest.ProductContactId,
+                ProductContactId = req.ProductContactId,
                 InterestAmount = interestAmount,
                 AccumulatedAmount = accumulatedInterest.AccumInterestRemain + interestAmount,
                 Remark = isMaxInterestAmount ? "ดอกเบี้ยรอบนี้สูงกว่าอัตราดอกเบี้ยสูงสุดต่อรอบบิล" : "ดอกเบี้ยรอบนี้",
             };
-            _statementInterestDAC.CreateStatementInterest(createStatementInterest);
+            _InterestTransactionDAC.CreateInterestTransaction(createInterestTransaction);
 
             // บันทึกข้อมูลดอกเบี้ยสะสม
             _accumulatedInterestDAC.UpdateAccumulatedInterest(accumulatedInterest.AccumInterestRemain + interestAmount);
