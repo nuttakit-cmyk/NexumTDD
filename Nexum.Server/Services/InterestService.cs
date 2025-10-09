@@ -21,7 +21,6 @@ namespace Nexum.Server.Services
         }
         public CalculateInterestResponse CalculateInterest(CalculateInterestRequest req)
         {
-
             // Validate the request
             if (req == null)
             {
@@ -85,10 +84,12 @@ namespace Nexum.Server.Services
             // คำนวณดอกเบี้ย
             if (req.InterestType == "PerMonth")
             {
+                // คำนวณดอกเบี้ยต่อเดือน จากยอดเงินต้นและอัตราดอกเบี้ย ปัดเศษ 2 ตำแหน่ง
                 interestAmount = Math.Round(req.PrincipalBalance * req.InterestRate, 2);
             }
             else if (req.InterestType == "PerDay")
             {
+                // คำนวณดอกเบี้ยต่อวัน จากยอดเงินต้นและอัตราดอกเบี้ย ปัดเศษ 2 ตำแหน่ง
                 interestAmount = Math.Round(req.PrincipalBalance * req.InterestRate / 365, 2);
             }
 
@@ -96,30 +97,30 @@ namespace Nexum.Server.Services
             bool isMaxInterestAmount = false;
             if (interestAmount > req.MaxInterestAmount)
             {
+                // ถ้าดอกเบี้ยรอบนี้สูงกว่าอัตราดอกเบี้ยสูงสุดต่อรอบบิล ให้ตั้งค่าเป็นอัตราดอกเบี้ยสูงสุดต่อรอบบิล
                 interestAmount = req.MaxInterestAmount;
                 isMaxInterestAmount = true;
             }
 
             // รวมยอดดอกเบี้ยสะสม และ สร้างรายการดอกเบี้ย
+            decimal accumulatedInterestAmount = accumulatedInterest.AccumInterestRemain + interestAmount; // รวมยอดดอกเบี้ยสะสม
+            // สร้างรายการดอกเบี้ย
             InterestTransaction createInterestTransaction = new InterestTransaction
             {
                 ProductContactId = req.ProductContactId,
                 InterestAmount = interestAmount,
-                AccumulatedAmount = accumulatedInterest.AccumInterestRemain + interestAmount,
+                AccumulatedAmount = accumulatedInterestAmount,
                 Remark = isMaxInterestAmount ? "ดอกเบี้ยรอบนี้สูงกว่าอัตราดอกเบี้ยสูงสุดต่อรอบบิล" : "ดอกเบี้ยรอบนี้",
             };
             _InterestTransactionDAC.CreateInterestTransaction(createInterestTransaction);
 
             // บันทึกข้อมูลดอกเบี้ยสะสม
-            _accumulatedInterestDAC.UpdateAccumulatedInterest(accumulatedInterest.AccumInterestRemain + interestAmount);
-
-            // Console.WriteLine("InterestAmount: " + interestAmount);
-            // Console.WriteLine("AccumInterestRemain: " + accumulatedInterest.AccumInterestRemain + interestAmount);
+            _accumulatedInterestDAC.UpdateAccumulatedInterest(accumulatedInterestAmount);
 
             return new CalculateInterestResponse()
             {
                 InterestAmount = interestAmount,
-                AccumInterestRemain = accumulatedInterest.AccumInterestRemain + interestAmount
+                AccumInterestRemain = accumulatedInterestAmount
             };
         }
     }
