@@ -1,4 +1,5 @@
-﻿using Nexum.Server.Models.Penalty;
+﻿using Nexum.Server.DAC;
+using Nexum.Server.Models.Penalty;
 
 namespace Nexum.Server.Services.Penalty
 {
@@ -9,23 +10,14 @@ namespace Nexum.Server.Services.Penalty
     }
     public class PenaltyPolicies : IPenaltyPolicies
     {
+        private readonly IPenaltyPoliciesDAC penaltyPoliciesDAC;
+        public PenaltyPolicies(IPenaltyPoliciesDAC penaltyPoliciesDAC) 
+        { 
+            this.penaltyPoliciesDAC = penaltyPoliciesDAC;
+        }
         public PenaltyPoliciesResponse penaltyPolicies(PenaltyPoliciesRequest penaltyPoliciesRequest)
         {
-            // Implement the logic to retrieve and return penalty policy details based on the request
-
-            PenaltyPoliciesResponse penaltyPoliciesResponse = new PenaltyPoliciesResponse
-            {
-                PenaltyPolicyID = penaltyPoliciesRequest.PenaltyPolicyID,
-                PolicyName = "Standard Daily Penalty",
-                PenaltyType = "Daily", // Daily, Fixed, Percentage
-                Rate = 50.0m, // Example rate
-                FixedAmount = 0.0m, // Not applicable for daily type
-                IndividualCap = 300.0m,
-                TotalCap = 1000.0m,
-                GracePeriodDays = 5
-            };
-
-            return penaltyPoliciesResponse;
+            return penaltyPoliciesDAC.GetPenaltyPolicies(penaltyPoliciesRequest);
         }
     }
     

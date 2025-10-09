@@ -37,9 +37,6 @@ namespace Nexum.Server.Services.Penalty
             if (penaltyRequest.UserId <= 0)
                 throw new ArgumentException("UserId must be greater than zero.");
 
-            if (string.IsNullOrEmpty(penaltyRequest.UserName))
-                throw new ArgumentException("UserName cannot be null or empty.");
-
             if (penaltyRequest.ActiveStatus == "Inactive")
                 throw new InvalidOperationException("Cannot calculate penalty for inactive users.");
 
@@ -50,18 +47,21 @@ namespace Nexum.Server.Services.Penalty
 
             PenaltyResponse penaltyResponse = new PenaltyResponse();
 
-
             //Get Penalty Policies By Id (Config Penalty Policies)
             PenaltyPoliciesResponse PenaltyPolicies = penaltyPolicies.penaltyPolicies(new PenaltyPoliciesRequest { PenaltyPolicyID = penaltyRequest.PenaltyPolicyID });
 
             //คำนวนยอดชำระขั้นต่ำ
+            
             decimal minPayment = penaltyRequest.OutstandingBalance * 0.1m; //
 
+            penaltyResponse.UserId = penaltyRequest.UserId;
+            //penaltyResponse.UserName = penaltyRequest.UserName;
+            penaltyResponse.OutstandingBalance = penaltyRequest.OutstandingBalance;
             penaltyResponse.MinimumPayment = minPayment;
-
+            penaltyResponse.PaymentAmount = penaltyRequest.PaymentAmount;
 
             //ตรวจสอบเลย วันครบกำหนด
-            if (penaltyRequest.DueDate < DateTime.Now || penaltyRequest.PaymentAmount < minPayment)
+            if (penaltyRequest.DueDate.Date < DateTime.Now.Date || penaltyRequest.PaymentAmount < minPayment)
             {
                 int OverdueDays = (DateTime.Now.Date - penaltyRequest.DueDate.Date).Days; //คำนวณจำนวนวันที่เกินกำหนด
                 // ควรคำนวนวันที่ปรับใหม่ไหม เช่น OverdueDaysNew = OverdueDays - GracePeriodDays
@@ -71,7 +71,8 @@ namespace Nexum.Server.Services.Penalty
                     {
                         OutstandingBalance = penaltyRequest.OutstandingBalance,
                         OverdueDays = OverdueDays,
-                        MaxPenalty = PenaltyPolicies.IndividualCap,
+                        MaxPenalty = PenaltyPolicies.MaxPenalty,
+                        TotalCap = PenaltyPolicies.TotalCap,
                         Percentage = PenaltyPolicies.Rate,
                         FixedAmount = PenaltyPolicies.FixedAmount,
                     };
@@ -84,7 +85,7 @@ namespace Nexum.Server.Services.Penalty
                             penaltyResponse.PenaltyAmount = dailyPenalty.Calculate(context);
                             break;
                         case "Fixed":
-                            penaltyResponse.PenaltyAmount = dailyPenalty.Calculate(context);
+                            penaltyResponse.PenaltyAmount = fixedPenalty.Calculate(context);
                             break;
                         default:
                             throw new NotSupportedException($"Penalty type '{PenaltyPolicies.PenaltyType}' is not supported.");
@@ -94,11 +95,13 @@ namespace Nexum.Server.Services.Penalty
                 {
                     penaltyResponse.PenaltyAmount = 0;
                 }
+                //penaltyResponse.TotalAmountDue = penaltyRequest.OutstandingBalance + penaltyResponse.PenaltyAmount - penaltyRequest.PaymentAmount;
+
             }
             else
             {
                 penaltyResponse.PenaltyAmount = 0;
-                penaltyResponse.TotalAmountDue = penaltyRequest.OutstandingBalance - penaltyRequest.PaymentAmount;
+                //penaltyResponse.TotalAmountDue = penaltyRequest.OutstandingBalance - penaltyRequest.PaymentAmount;
                 return penaltyResponse;
             }
 

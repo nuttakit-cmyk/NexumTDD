@@ -18,7 +18,7 @@ namespace Nexum.Server.Controllers
             this.penalty = penalty;
         }
 
-        [HttpGet("GetPenaltyByUser")]
+        [HttpPost("GetPenaltyByUser")]
         public PenaltyResponse GetPenaltyByUser(PenaltyRequest penaltyRequest)
         {
             return penalty.GetPenalty(penaltyRequest);
