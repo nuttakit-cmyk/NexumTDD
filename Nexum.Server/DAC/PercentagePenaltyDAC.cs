@@ -1,4 +1,4 @@
-﻿using Nexum.Server.Models;
+﻿using Nexum.Server.Models.Penalty;
 
 namespace Nexum.Server.DAC
 {
