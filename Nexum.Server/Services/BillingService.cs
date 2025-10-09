@@ -13,20 +13,22 @@ namespace Nexum.Server.Services
     {
         private readonly IInterestService _interestService;
         private readonly IPenaltyService _penaltyService;
-        private readonly INexumConfigDAC _nexumConfigDAC;
+        private readonly ICreditWalletDAC _creditWalletDAC;
+        private readonly IProductContactDAC _productContactDAC;
 
-        public BillingService(IInterestService interestService, IPenaltyService penaltyService, INexumConfigDAC nexumConfigDAC)
+        public BillingService(IInterestService interestService, IPenaltyService penaltyService, ICreditWalletDAC creditWalletDAC, IProductContactDAC productContactDAC)
         {
             _interestService = interestService;
             _penaltyService = penaltyService;
-            _nexumConfigDAC = nexumConfigDAC;
+            _creditWalletDAC = creditWalletDAC;
+            _productContactDAC = productContactDAC;
         }
 
         public BillingResponse ProcessAndCalculateBill(BillingRequest billingRequest)
         {
             // ดึงข้อมูลกระเป๋าสินเชื่อ และ สัญญาสินเชื่อ
-            CreditWallet creditWallet = _nexumConfigDAC.GetCreditWallet(billingRequest.CreditWalletId);
-            ProductContact productContact = _nexumConfigDAC.GetProductContact(billingRequest.CreditWalletId);
+            CreditWallet creditWallet = _creditWalletDAC.GetCreditWallet(billingRequest.CreditWalletId);
+            ProductContact productContact = _productContactDAC.GetProductContact(billingRequest.CreditWalletId);
 
             // คำนวณค่าปรับ
             // CalculatePenaltyRequest calculatePenaltyRequest = new CalculatePenaltyRequest() { PenaltyPolicyID = billingRequest.PenaltyPolicyID };

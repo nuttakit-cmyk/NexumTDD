@@ -11,10 +11,13 @@ namespace Nexum.Server.Services
     }
     public class InterestService : IInterestService
     {
-        private readonly INexumConfigDAC _nexumConfigDAC;
-        public InterestService(INexumConfigDAC nexumConfigDAC)
+        private readonly IAccumulatedInterestDAC _accumulatedInterestDAC;
+        private readonly IStatementInterestDAC _statementInterestDAC;
+
+        public InterestService(IAccumulatedInterestDAC accumulatedInterestDAC, IStatementInterestDAC statementInterestDAC)
         {
-            _nexumConfigDAC = nexumConfigDAC;
+            _accumulatedInterestDAC = accumulatedInterestDAC;
+            _statementInterestDAC = statementInterestDAC;
         }
         public CalculateInterestResponse CalculateInterest(CalculateInterestRequest calculateInterestRequest)
         {
@@ -51,7 +54,7 @@ namespace Nexum.Server.Services
             }
 
             // ดึงข้อมูลดอกเบี้ยสะสม
-            AccumulatedInterest accumulatedInterest = _nexumConfigDAC.GetAccumulatedInterest(calculateInterestRequest.ProductContactId);
+            AccumulatedInterest accumulatedInterest = _accumulatedInterestDAC.GetAccumulatedInterest(calculateInterestRequest.ProductContactId);
 
             // ตรวจสอบว่าอยู่ในระยะปลอดดอกเบี้ยหรือไม่
             if (calculateInterestRequest.InterestFreePeriodDays != default(DateTime))
@@ -67,7 +70,7 @@ namespace Nexum.Server.Services
                         AccumulatedAmount = accumulatedInterest.AccumInterestRemain,
                         Remark = "ยกเว้นการคำนวณดอกเบี้ย",
                     };
-                    _nexumConfigDAC.CreateStatementInterest(statementInterest);
+                    _statementInterestDAC.CreateStatementInterest(statementInterest);
 
                     return new CalculateInterestResponse
                     {
@@ -105,10 +108,10 @@ namespace Nexum.Server.Services
                 AccumulatedAmount = accumulatedInterest.AccumInterestRemain + interestAmount,
                 Remark = isMaxInterestAmount ? "ดอกเบี้ยรอบนี้สูงกว่าอัตราดอกเบี้ยสูงสุดต่อรอบบิล" : "ดอกเบี้ยรอบนี้",
             };
-            _nexumConfigDAC.CreateStatementInterest(createStatementInterest);
+            _statementInterestDAC.CreateStatementInterest(createStatementInterest);
 
             // บันทึกข้อมูลดอกเบี้ยสะสม
-            _nexumConfigDAC.UpdateAccumulatedInterest(accumulatedInterest.AccumInterestRemain + interestAmount);
+            _accumulatedInterestDAC.UpdateAccumulatedInterest(accumulatedInterest.AccumInterestRemain + interestAmount);
 
             // Console.WriteLine("InterestAmount: " + interestAmount);
             // Console.WriteLine("AccumInterestRemain: " + accumulatedInterest.AccumInterestRemain + interestAmount);
