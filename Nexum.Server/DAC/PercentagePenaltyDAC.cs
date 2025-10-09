@@ -6,7 +6,7 @@ namespace Nexum.Server.DAC
     {
         PenaltyPoliciesResponse GetSomethingFromDb(int id);
     }
-    public class PercentagePenaltyDAC
+    public class PercentagePenaltyDAC : IPercentagePenaltyDAC
     {
         public PenaltyPoliciesResponse GetSomethingFromDb(int id)
         {

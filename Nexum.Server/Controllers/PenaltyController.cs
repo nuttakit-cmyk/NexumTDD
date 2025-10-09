@@ -15,13 +15,41 @@ namespace Nexum.Server.Controllers
         {
             this.percentagePenalty = percentagePenalty;
         }
-        
-        public PenaltyPoliciesResponse xxxx(PenaltyPoliciesRequest penaltyPoliciesRequest)
-        {
-            PenaltyPoliciesResponse x = percentagePenalty.Calculate(penaltyPoliciesRequest);
 
-            return x;
+        [HttpGet("GetPenaltyByUser")]
+        public PenaltyResponse GetPenaltyByUser(Users UsersRequest)
+        {
+            //PenaltyPoliciesResponse x = percentagePenalty.Calculate(UsersRequest);
+
+            #region Validation
+            if (UsersRequest == null)
+                throw new ArgumentNullException(nameof(UsersRequest));
+            if (UsersRequest.OutstandingBalance <= 0)
+                throw new ArgumentException("OutstandingBalance must be greater than zero.");
+            if (UsersRequest.DueDate == null)
+                throw new ArgumentException("DueDate must be a valid date.");
+            if (string.IsNullOrEmpty(UsersRequest.ActiveStatus) || (UsersRequest.ActiveStatus != "Active" && UsersRequest.ActiveStatus != "Inactive"))
+                throw new ArgumentException("ActiveStatus must be either 'Active' or 'Inactive'.");
+            if (UsersRequest.UserId <= 0)
+                throw new ArgumentException("UserId must be greater than zero.");
+            if (string.IsNullOrEmpty(UsersRequest.UserName))
+                throw new ArgumentException("UserName cannot be null or empty.");
+            if (UsersRequest.ActiveStatus == "Inactive")
+                throw new InvalidOperationException("Cannot calculate penalty for inactive users.");
+            if (UsersRequest.DueDate > DateTime.Now)
+                throw new InvalidOperationException("DueDate cannot be in the future.");
+            #endregion
+
+
+
+
+
+            return null;
         }
+
+
+        //Get
+
 
 
     }
