@@ -1,4 +1,4 @@
-﻿namespace Nexum.Server.Models
+﻿namespace Nexum.Server.Models.Penalty
 {
     public class PenaltyPoliciesResponse
     {
