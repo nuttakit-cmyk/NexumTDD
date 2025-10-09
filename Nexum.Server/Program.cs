@@ -1,5 +1,6 @@
 using Nexum.Server.DAC;
 using Nexum.Server.Services;
+using Nexum.Server.Services.Penalty;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,10 +18,17 @@ builder.Services.AddScoped<ICreditWalletDAC, CreditWalletDAC>();
 builder.Services.AddScoped<IProductContactDAC, ProductContactDAC>();
 builder.Services.AddScoped<IAccumulatedInterestDAC, AccumulatedInterestDAC>();
 builder.Services.AddScoped<IInterestTransactionDAC, InterestTransactionDAC>();
+builder.Services.AddScoped<IPenaltyPoliciesDAC, PenaltyPoliciesDAC>();
 
 // Register Service services
 builder.Services.AddScoped<IInterestService, InterestService>();
 builder.Services.AddScoped<IBillingService, BillingService>();
+builder.Services.AddScoped<IPenalty, Penalty>();
+builder.Services.AddScoped<IDailyPenalty, DailyPenalty>();
+builder.Services.AddScoped<IPercentagePenalty, PercentagePenalty>();
+builder.Services.AddScoped<IPenaltyPolicies, PenaltyPolicies>();
+builder.Services.AddScoped<IFixedPenalty, FixedPenalty>();
+
 
 var app = builder.Build();
 

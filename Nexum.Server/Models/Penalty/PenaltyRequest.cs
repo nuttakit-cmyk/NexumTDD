@@ -1,10 +1,12 @@
 ﻿namespace Nexum.Server.Models.Penalty
 {
-    public class PenaltyRequest : Users
+    public class PenaltyRequest
     {
-        public decimal MinimumPayment { get; set; } //ยอดชำระขั้นต่ำที่ต้องชำระ
-        public decimal MaximumPayment { get; set; } //ยอดชำระสูงสุดที่ต้องชำระ
+        public int UserId { get; set; } //รหัสบัญชี (คีย์หลัก)
+        public int PenaltyPolicyID { get; set; }
+        public string ActiveStatus { get; set; } //สถานะบัญชี (เช่น Active, Inactive)
+        public decimal OutstandingBalance { get; set; } //ยอดค้างชำระปัจจุบัน
+        public DateTime DueDate { get; set; } //วันครบกำหนดชำระรอบล่าสุด
         public decimal PaymentAmount { get; set; } //ยอดชำระที่ลูกค้าชำระเข้ามา
-        public PenaltyRequest() { }
     }
 }
