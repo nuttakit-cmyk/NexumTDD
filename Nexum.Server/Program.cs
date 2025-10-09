@@ -16,7 +16,7 @@ builder.Services.AddScoped<INexumConfigDAC, NexumConfigDAC>();
 builder.Services.AddScoped<ICreditWalletDAC, CreditWalletDAC>();
 builder.Services.AddScoped<IProductContactDAC, ProductContactDAC>();
 builder.Services.AddScoped<IAccumulatedInterestDAC, AccumulatedInterestDAC>();
-builder.Services.AddScoped<IStatementInterestDAC, StatementInterestDAC>();
+builder.Services.AddScoped<IInterestTransactionDAC, InterestTransactionDAC>();
 
 // Register Service services
 builder.Services.AddScoped<IInterestService, InterestService>();

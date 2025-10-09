@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Nexum.Server.Models
 {
-    public class ProductContact
+    public class ProductContact : BaseEntity
     {
         [Key]
         public int ProductContactId { get; set; } // รหัสสัญญาสินเชื่อ (Product Contract Id)
@@ -24,9 +24,5 @@ namespace Nexum.Server.Models
         public DateTime InterestFreePeriodDays { get; set; } // ระยะปลอดดอกเบี้ย วันสิ้นสุด
         public DateTime PenaltyFreePeriodDays { get; set; } // ระยะปลอดค่าปรับ วันสิ้นสุด
         public bool Active { get; set; } // สถานะการใช้งาน
-        public DateTime CreateDate { get; set; } // วันที่สร้างข้อมูล
-        public string? CreateBy { get; set; } // ผู้สร้างข้อมูล
-        public DateTime UpdateDate { get; set; } // วันที่แก้ไขข้อมูลล่าสุด
-        public string? UpdateBy { get; set; } // ผู้แก้ไขข้อมูลล่าสุด
     }
 }

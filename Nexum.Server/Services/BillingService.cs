@@ -13,14 +13,16 @@ namespace Nexum.Server.Services
     public class BillingService : IBillingService
     {
         private readonly IInterestService _interestService;
-        private readonly IPenaltyService _penaltyService;
+        // private readonly IPenaltyService _penaltyService;
         private readonly ICreditWalletDAC _creditWalletDAC;
         private readonly IProductContactDAC _productContactDAC;
 
-        public BillingService(IInterestService interestService, IPenaltyService penaltyService, ICreditWalletDAC creditWalletDAC, IProductContactDAC productContactDAC)
+        public BillingService(IInterestService interestService
+        // , IPenaltyService penaltyService
+        , ICreditWalletDAC creditWalletDAC, IProductContactDAC productContactDAC)
         {
             _interestService = interestService;
-            _penaltyService = penaltyService;
+            // _penaltyService = penaltyService;
             _creditWalletDAC = creditWalletDAC;
             _productContactDAC = productContactDAC;
         }
