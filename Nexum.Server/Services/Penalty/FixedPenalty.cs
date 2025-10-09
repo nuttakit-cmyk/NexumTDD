@@ -2,23 +2,16 @@
 
 namespace Nexum.Server.Services.Penalty
 {
-    public interface IPenaltyStrategy
+    public interface IFixedPenalty
     {
         decimal Calculate(PenaltyContext context);
     }
-    public class FixedPenalty 
+    public class FixedPenalty : IFixedPenalty
     {
-        private readonly decimal fixedAmount;
-
-        public FixedPenalty(decimal fixedAmount)
-        {
-            this.fixedAmount = fixedAmount;
-        }
-
         public decimal Calculate(PenaltyContext context)
         {
             // คืนค่าปรับตามยอดคงที่ที่กำหนด
-            return fixedAmount;
+            return context.FixedAmount;
         }
     }
 }
