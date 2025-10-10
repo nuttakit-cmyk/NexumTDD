@@ -71,6 +71,7 @@ namespace Nexum.Server.Services
                     };
                     _InterestTransactionDAC.CreateInterestTransaction(InterestTransaction);
 
+                    // ส่งข้อมูลดอกเบี้ยกลับ
                     return new CalculateInterestResponse
                     {
                         InterestAmount = 0,
@@ -104,6 +105,7 @@ namespace Nexum.Server.Services
 
             // รวมยอดดอกเบี้ยสะสม และ สร้างรายการดอกเบี้ย
             decimal accumulatedInterestAmount = accumulatedInterest.AccumInterestRemain + interestAmount; // รวมยอดดอกเบี้ยสะสม
+
             // สร้างรายการดอกเบี้ย
             InterestTransaction createInterestTransaction = new InterestTransaction
             {
