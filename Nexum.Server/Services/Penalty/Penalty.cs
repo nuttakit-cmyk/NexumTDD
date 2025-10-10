@@ -1,4 +1,5 @@
-﻿using Nexum.Server.Models.Penalty;
+﻿using Nexum.Server.Models;
+using Nexum.Server.Models.Penalty;
 
 namespace Nexum.Server.Services.Penalty
 {
@@ -48,7 +49,7 @@ namespace Nexum.Server.Services.Penalty
             PenaltyResponse penaltyResponse = new PenaltyResponse();
 
             //Get Penalty Policies By Id (Config Penalty Policies)
-            PenaltyPoliciesResponse PenaltyPolicies = penaltyPolicies.penaltyPolicies(new PenaltyPoliciesRequest { PenaltyPolicyID = penaltyRequest.PenaltyPolicyID });
+            ProductContact PenaltyPolicies = penaltyPolicies.penaltyPolicies(new PenaltyPoliciesRequest { PenaltyPolicyID = penaltyRequest.PenaltyPolicyID });
 
             //คำนวนยอดชำระขั้นต่ำ
             decimal minPayment = penaltyRequest.OutstandingBalance * 0.1m; //
@@ -63,7 +64,7 @@ namespace Nexum.Server.Services.Penalty
             {
                 int OverdueDays = (DateTime.Now.Date - penaltyRequest.DueDate.Date).Days; //คำนวณจำนวนวันที่เกินกำหนด
                 // ควรคำนวนวันที่ปรับใหม่ไหม เช่น OverdueDaysNew = OverdueDays - GracePeriodDays
-                if (OverdueDays > PenaltyPolicies.GracePeriodDays)
+                if (OverdueDays > PenaltyPolicies.PenaltyFreePeriodDays)
                 {
                     PenaltyContext context = new PenaltyContext
                     {
@@ -71,7 +72,7 @@ namespace Nexum.Server.Services.Penalty
                         OverdueDays = OverdueDays,
                         MaxPenalty = PenaltyPolicies.MaxPenalty,
                         TotalCap = PenaltyPolicies.TotalCap,
-                        Percentage = PenaltyPolicies.Rate,
+                        Percentage = PenaltyPolicies.PenaltyRate,
                         FixedAmount = PenaltyPolicies.FixedAmount,
                     };
                     switch (PenaltyPolicies.PenaltyType)
