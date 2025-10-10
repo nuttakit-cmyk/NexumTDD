@@ -51,11 +51,9 @@ namespace Nexum.Server.Services.Penalty
             PenaltyPoliciesResponse PenaltyPolicies = penaltyPolicies.penaltyPolicies(new PenaltyPoliciesRequest { PenaltyPolicyID = penaltyRequest.PenaltyPolicyID });
 
             //คำนวนยอดชำระขั้นต่ำ
-            
             decimal minPayment = penaltyRequest.OutstandingBalance * 0.1m; //
 
             penaltyResponse.UserId = penaltyRequest.UserId;
-            //penaltyResponse.UserName = penaltyRequest.UserName;
             penaltyResponse.OutstandingBalance = penaltyRequest.OutstandingBalance;
             penaltyResponse.MinimumPayment = minPayment;
             penaltyResponse.PaymentAmount = penaltyRequest.PaymentAmount;
@@ -95,13 +93,10 @@ namespace Nexum.Server.Services.Penalty
                 {
                     penaltyResponse.PenaltyAmount = 0;
                 }
-                //penaltyResponse.TotalAmountDue = penaltyRequest.OutstandingBalance + penaltyResponse.PenaltyAmount - penaltyRequest.PaymentAmount;
-
             }
             else
             {
                 penaltyResponse.PenaltyAmount = 0;
-                //penaltyResponse.TotalAmountDue = penaltyRequest.OutstandingBalance - penaltyRequest.PaymentAmount;
                 return penaltyResponse;
             }
 
