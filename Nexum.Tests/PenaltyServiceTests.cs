@@ -44,7 +44,7 @@ namespace Nexum.Tests
                 IndividualCap = 999999m,
                 FixedAmount = 50m
             };
-            var expected = new PenaltyResponse
+            PenaltyResponse expected = new PenaltyResponse
             {
                 UserId = 1,
                 UserName = "U",
@@ -97,6 +97,12 @@ namespace Nexum.Tests
             var result = sut.GetPenalty(c.Request);
 
             //Assert
+            Console.WriteLine($"[EXP] UserId={c.Expected.UserId}, UserName={c.Expected.UserName}, " +
+                  $"Outstanding={c.Expected.OutstandingBalance}, Min={c.Expected.MinimumPayment}, " +
+                  $"Penalty={c.Expected.PenaltyAmount}, Total={c.Expected.TotalAmountDue}");
+            Console.WriteLine($"[ACT] UserId={result.UserId}, UserName={result.UserName}, " +
+                              $"Outstanding={result.OutstandingBalance}, Min={result.MinimumPayment}, " +
+                              $"Penalty={result.PenaltyAmount}, Total={result.TotalAmountDue}");
             Assert.NotNull(result);
             Assert.Equal(c.Expected.UserId, result.UserId);
             Assert.Equal(c.Expected.UserName, result.UserName);

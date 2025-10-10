@@ -48,8 +48,12 @@ namespace Nexum.Server.Services.Penalty
 
             #endregion
 
-            PenaltyResponse penaltyResponse = new PenaltyResponse();
-
+            PenaltyResponse penaltyResponse = new PenaltyResponse
+            {
+                UserId = penaltyRequest.UserId,
+                UserName = penaltyRequest.UserName,
+                OutstandingBalance = penaltyRequest.OutstandingBalance
+            };
 
             //Get Penalty Policies By Id (Config Penalty Policies)
             PenaltyPoliciesResponse PenaltyPolicies = penaltyPolicies.penaltyPolicies(new PenaltyPoliciesRequest { PenaltyPolicyID = penaltyRequest.PenaltyPolicyID });
@@ -84,7 +88,7 @@ namespace Nexum.Server.Services.Penalty
                             penaltyResponse.PenaltyAmount = dailyPenalty.Calculate(context);
                             break;
                         case "Fixed":
-                            penaltyResponse.PenaltyAmount = dailyPenalty.Calculate(context);
+                            penaltyResponse.PenaltyAmount = fixedPenalty.Calculate(context);
                             break;
                         default:
                             throw new NotSupportedException($"Penalty type '{PenaltyPolicies.PenaltyType}' is not supported.");
