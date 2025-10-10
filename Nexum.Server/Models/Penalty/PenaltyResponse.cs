@@ -8,6 +8,5 @@
         public decimal PenaltyAmount { get; set; } //ยอดค่าปรับที่ต้องชำระ
         //public decimal TotalAmountDue { get; set; } //ยอดรวมที่ต้องชำระ (OutstandingBalance + PenaltyAmount - PaymentAmount) remaining balance
         public decimal PaymentAmount { get; set; } //ยอดชำระที่ลูกค้าชำระเข้ามา
-
     }
 }
