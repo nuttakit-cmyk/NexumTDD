@@ -30,28 +30,26 @@ namespace Nexum.Tests
             var req = new PenaltyRequest
             {
                 UserId = 1,
-                UserName = "U",
                 OutstandingBalance = 500m,
                 PaymentAmount = 0m,            // = 10%
-                DueDate = now.AddDays(-1),        // ยังไม่ถึงกำหนด
+                DueDate = now.AddDays(-9),        // ยังไม่ถึงกำหนด
                 ActiveStatus = "Active",
                 PenaltyPolicyID = 1
             };
             var policy = new PenaltyPoliciesResponse
             {
-                PenaltyType = "Fixed",
-                GracePeriodDays = 0,
-                IndividualCap = 999999m,
-                FixedAmount = 50m
+                PenaltyPolicyID = 2,
+                PenaltyType = "Daily",
+                FixedAmount = 100m,
+                TotalCap = 1000m,
+                GracePeriodDays = 5
             };
             PenaltyResponse expected = new PenaltyResponse
             {
                 UserId = 1,
-                UserName = "U",
                 OutstandingBalance = 500m,
                 MinimumPayment = 50m,
-                PenaltyAmount = 50m,
-                TotalAmountDue = 550m
+                PenaltyAmount = 500m,
             };
 
             yield return new object[] { new Case(req, policy, expected) };
@@ -88,7 +86,7 @@ namespace Nexum.Tests
                         break;
                     case "Fixed":
                         _fixed.Setup(f => f.Calculate(It.IsAny<PenaltyContext>()))
-                              .Returns(c.Expected.PenaltyAmount);
+                              .Returns((PenaltyContext ctx) => ctx.FixedAmount);
                         break;
                 }
             }
@@ -97,19 +95,17 @@ namespace Nexum.Tests
             var result = sut.GetPenalty(c.Request);
 
             //Assert
-            Console.WriteLine($"[EXP] UserId={c.Expected.UserId}, UserName={c.Expected.UserName}, " +
+            Console.WriteLine($"[EXP] UserId={c.Expected.UserId}, " +
                   $"Outstanding={c.Expected.OutstandingBalance}, Min={c.Expected.MinimumPayment}, " +
-                  $"Penalty={c.Expected.PenaltyAmount}, Total={c.Expected.TotalAmountDue}");
-            Console.WriteLine($"[ACT] UserId={result.UserId}, UserName={result.UserName}, " +
-                              $"Outstanding={result.OutstandingBalance}, Min={result.MinimumPayment}, " +
-                              $"Penalty={result.PenaltyAmount}, Total={result.TotalAmountDue}");
+                  $"Penalty={c.Expected.PenaltyAmount}");
+            Console.WriteLine($"[ACT] UserId={result.UserId}," +
+                                $"Outstanding={result.OutstandingBalance}, Min={result.MinimumPayment}, " +
+                              $"Penalty={result.PenaltyAmount}");
             Assert.NotNull(result);
             Assert.Equal(c.Expected.UserId, result.UserId);
-            Assert.Equal(c.Expected.UserName, result.UserName);
             Assert.Equal(c.Expected.OutstandingBalance, result.OutstandingBalance);
             Assert.Equal(c.Expected.MinimumPayment, result.MinimumPayment);
             Assert.Equal(c.Expected.PenaltyAmount, result.PenaltyAmount);
-            Assert.Equal(c.Expected.TotalAmountDue, result.TotalAmountDue);
 
             _daily.Verify(d => d.Calculate(It.IsAny<PenaltyContext>()),
                 c.Policy.PenaltyType == "Daily" ? Times.Once() : Times.Never());
